@@ -68,6 +68,12 @@
       "languageVersion": "2.10"
     },
     {
+      "name": "math_expressions",
+      "rootUri": "file:///home/anurodh/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/math_expressions-2.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.1"
+    },
+    {
       "name": "meta",
       "rootUri": "file:///home/anurodh/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/meta-1.3.0-nullsafety.3",
       "packageUri": "lib/",
@@ -140,7 +146,7 @@
       "languageVersion": "2.7"
     }
   ],
-  "generated": "2021-01-30T17:31:15.306229Z",
+  "generated": "2021-02-19T17:48:22.085834Z",
   "generator": "pub",
   "generatorVersion": "2.10.5"
 }
