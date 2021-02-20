@@ -1,168 +1,227 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:math_expressions/math_expressions.dart';
+import 'dart:ui';
 
-void main() {
-  runApp(MyApp());
+void main(){
+  runApp(Calculator());
 }
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+
+class Calculator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Calculator App',
-      theme: ThemeData(
-        primarySwatch: Colors.deepOrange,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: MyHomePage(title: 'Calculator'),
+      debugShowCheckedModeBanner: false,
+      title: "Simple Calculator",
+      theme: ThemeData(primarySwatch: Colors.deepOrange),
+      home: SimpleCalculator(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
-
+class SimpleCalculator extends StatefulWidget {
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _SimpleCalculatorState createState() => _SimpleCalculatorState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _SimpleCalculatorState extends State<SimpleCalculator> {
 
-  String output = "0";
+  String equation = "0";
+  String result = "";
+  String expression = "";
+  double equationFont = 38.0;
+  double resultFont = 48.0;
 
-  String _output = "0";
-  double num1 = 0.0;
-  double num2 = 0.0;
-  String operand = "";
-
-
-  PressedButton(String buttonText) {
-
-    if (buttonText == "Clear") {
-       _output = "0";
-       num1 = 0.0;
-       num2 = 0.0;
-       operand = "";
-    }
-    else if (buttonText == "+" || buttonText == "-" || buttonText == "*" || buttonText == "/"){
-        num1 = double.parse(output);
-        operand = buttonText;
-        _output = "0";
-    }
-    else if (buttonText == ".") {
-      if (_output.contains(".")){
-        print("Already contains a decimal ");
-      }
-      else{
-        _output = _output + buttonText;
-      }
-    }
-    else if (buttonText == "Ans"){
-      num2 = double.parse(output);
-      if (operand == "+"){
-        _output = (num1 + num2).toString();
-      }
-      if (operand == "-"){
-        _output = (num1 - num2).toString();
-      }
-      if (operand == "*"){
-        _output = (num1 * num2).toString();
-      }
-      if (operand == "/"){
-        _output = (num1 / num2).toString();
-      }
-      num1 = 0.0;
-      num2 = 0.0;
-      operand = "";
-    }
-    else {
-      _output = _output + buttonText;
-    }
-    print(_output);
+  buttonPressed(String buttonText){
     setState(() {
-      output = double.parse(_output).toStringAsFixed(2);
+      if(buttonText == "C"){
+        equation = "0";
+        result = "";
+        equationFont = 38.0;
+        resultFont = 48.0;
+      }
+
+      else if(buttonText == "⌫"){
+        equationFont = 48.0;
+        resultFont = 38.0;
+        equation = equation.substring(0, equation.length - 1);
+        if(equation == ""){
+          equation = "0";
+        }
+      }
+
+      else if(buttonText == "="){
+        equationFont = 38.0;
+        resultFont = 48.0;
+
+        expression = equation;
+        expression = expression.replaceAll('×', '*');
+        expression = expression.replaceAll('÷', '/');
+
+        try{
+          Parser p = Parser();
+          Expression exp = p.parse(expression);
+
+          ContextModel cm = ContextModel();
+          result = '${exp.evaluate(EvaluationType.REAL, cm)}';
+        }catch(e){
+          result = "Error";
+        }
+
+      }
+
+      else{
+        equationFont = 48.0;
+        resultFont = 38.0;
+        if(equation == "0"){
+          equation = buttonText;
+        }else {
+          equation = equation + buttonText;
+        }
+      }
     });
   }
 
-  Widget buttons(String buttontext,Color rang,Color rang1 ) {
-    return Expanded(
+  Widget buildButton(String buttonText, double buttonHeight, Color buttonColor){
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.1 * buttonHeight,
+      color: buttonColor,
       child: FlatButton(
-        color: rang,
-        padding: EdgeInsets.all(28.0),
-        child: Text(buttontext,
-          style: TextStyle(
-            color: rang1,
-              fontSize: 25.0,
-              fontWeight: FontWeight.bold,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(0.0),
+              side: BorderSide(
+                  color: Colors.black,
+                  width: 1,
+                  style: BorderStyle.solid
+              )
           ),
-        ),
-        onPressed: () =>
-          PressedButton(buttontext)
+          padding: EdgeInsets.all(16.0),
+          onPressed: () => buttonPressed(buttonText),
+          child: Text(
+            buttonText,
+            style: TextStyle(
+                fontSize: 30.0,
+                fontWeight: FontWeight.normal,
+                color: Colors.white
+            ),
+          )
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-          centerTitle: true,
-        ),
-        body: Container(
-          child: Column(
+      appBar: AppBar(title: Text('Calculator',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 30)),centerTitle: true),
+      body: Column(
+        children: <Widget>[
+
+
+          Container(
+            alignment: Alignment.centerRight,
+            padding: EdgeInsets.fromLTRB(10, 20, 10, 0),
+            child: Text(equation, style: TextStyle(fontSize: equationFont)),
+          ),
+
+
+          Container(
+            alignment: Alignment.centerRight,
+            padding: EdgeInsets.fromLTRB(10, 30, 10, 0),
+            child: Text(result, style: TextStyle(fontSize: resultFont),),
+          ),
+
+
+          Expanded(
+            child: Divider(),
+          ),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Container(
-                child: Text(output,
-                  style: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                  ),
+                width: MediaQuery.of(context).size.width * .75,
+                child: Table(
+                  children: [
+                    TableRow(
+                        children: [
+                          buildButton("C", 1, Colors.grey),
+                          buildButton("⌫", 1, Colors.grey),
+                          buildButton("÷", 1, Colors.grey),
+                        ]
+                    ),
+
+                    TableRow(
+                        children: [
+                          buildButton("7", 1, Colors.black54),
+                          buildButton("8", 1, Colors.black54),
+                          buildButton("9", 1, Colors.black54),
+                        ]
+                    ),
+
+                    TableRow(
+                        children: [
+                          buildButton("4", 1, Colors.black54),
+                          buildButton("5", 1, Colors.black54),
+                          buildButton("6", 1, Colors.black54),
+                        ]
+                    ),
+
+                    TableRow(
+                        children: [
+                          buildButton("1", 1, Colors.black54),
+                          buildButton("2", 1, Colors.black54),
+                          buildButton("3", 1, Colors.black54),
+                        ]
+                    ),
+
+                    TableRow(
+                        children: [
+                          buildButton(".", 1, Colors.black54),
+                          buildButton("0", 1, Colors.black54),
+                          buildButton("00", 1, Colors.black54),
+                        ]
+                    ),
+                  ],
                 ),
-                alignment: Alignment.centerRight,
-                padding: EdgeInsets.symmetric(vertical: 24,horizontal: 12),
               ),
 
-              Expanded(
-                  child: Divider(color: Colors.blue,)
-              ),
-              Column(
-                  children:[
-                    Row(
+
+              Container(
+                width: MediaQuery.of(context).size.width * 0.25,
+                child: Table(
+                  children: [
+                    TableRow(
                         children: [
-                          buttons("7",Colors.white70,Colors.black),
-                          buttons("8",Colors.white70,Colors.black),
-                          buttons("9",Colors.white70,Colors.black),
-                          buttons("-",Colors.black12,Colors.blue),
-                        ]),
-                    Row(children: [
-                      buttons("4",Colors.white70,Colors.black),
-                      buttons("5",Colors.white70,Colors.black),
-                      buttons("6",Colors.white70,Colors.black),
-                      buttons("*",Colors.black12,Colors.blue),
-                    ]),
-                    Row(children: [
-                      buttons("1",Colors.white70,Colors.black),
-                      buttons("2",Colors.white70,Colors.black),
-                      buttons("3",Colors.white70,Colors.black),
-                      buttons("/",Colors.black12,Colors.blue),
-                    ]),
-                    Row(children: [
-                      buttons(".",Colors.white70,Colors.black),
-                      buttons("0",Colors.white70,Colors.black),
-                      buttons("00",Colors.white70,Colors.black),
-                      buttons("+",Colors.black12,Colors.blue),
-                    ]),
-                    Row(children: [
-                      buttons("Clear",Colors.black12,Colors.blue),
-                      buttons("Ans",Colors.deepOrange,Colors.white),
-                    ]),
-                  ])
+                          buildButton("×", 1, Colors.grey),
+                        ]
+                    ),
+
+                    TableRow(
+                        children: [
+                          buildButton("-", 1, Colors.grey),
+                        ]
+                    ),
+
+                    TableRow(
+                        children: [
+                          buildButton("+", 1, Colors.grey),
+                        ]
+                    ),
+
+                    TableRow(
+                        children: [
+                          buildButton("=", 2, Colors.deepOrange),
+                        ]
+                    ),
+                  ],
+                ),
+              )
             ],
           ),
-        )
+
+        ],
+      ),
     );
   }
 }
