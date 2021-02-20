@@ -196,19 +196,19 @@ class _BasicCalculatorState extends State<BasicCalculator> {
                   children: [
                     TableRow(
                         children: [
-                          buildButton("×", 1, Colors.grey[400],Colors.deepOrange),
+                          buildButton("×", 1, Colors.grey[400],Colors.black),
                         ]
                     ),
 
                     TableRow(
                         children: [
-                          buildButton("-", 1, Colors.grey[400],Colors.deepOrange),
+                          buildButton("-", 1, Colors.grey[400],Colors.black),
                         ]
                     ),
 
                     TableRow(
                         children: [
-                          buildButton("+", 1, Colors.grey[400],Colors.deepOrange),
+                          buildButton("+", 1, Colors.grey[400],Colors.black),
                         ]
                     ),
 
